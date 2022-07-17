@@ -1,4 +1,10 @@
+# Streamlit Dependencies
 import streamlit as st
+
+# Data handling dependencies
+import pandas as pd
+import numpy as np
+
 
 
 
