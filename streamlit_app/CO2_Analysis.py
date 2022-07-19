@@ -32,7 +32,7 @@ def main():
         st.image('streamlit_app/imgs/raph.jpeg',use_column_width=True, caption = 'Raphael')
         st.image('streamlit_app/imgs/ebere.jpeg',use_column_width=True, caption = 'Ebere')
         st.image('streamlit_app/imgs/dare.jpeg',use_column_width=True, caption = 'Dare')
-        st.image('streamlit_app/imgs/israel.jpeg',use_column_width=True, caption = 'Israel')
+        st.image('streamlit_app/imgs/israel.png',use_column_width=True, caption = 'Israel')
 
         st.write('## Problem Statement')
 
