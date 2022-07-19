@@ -26,7 +26,7 @@ def main():
         # Header contents
         st.write('# CO2 Emission Analysis')
         st.write('### Ai Glass Data Science Team')
-        st.image('imgs/teddy.jpeg',use_column_width=True)
+        st.image('streamlit_app/imgs/teddy.jpeg',use_column_width=True)
 
 
 
