@@ -24,8 +24,8 @@ def main():
 
     if page_selection == "Introduction":
         # Header contents
-        st.write('# Movie Recommender Engine')
-        st.write('### EXPLORE Data Science Academy Unsupervised Predict')
+        st.write('# CO2 Emission Analysis')
+        st.write('### Ai Glass Data Science Team')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
 
 
