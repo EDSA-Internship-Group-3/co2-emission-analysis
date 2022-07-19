@@ -25,8 +25,9 @@ def main():
     if page_selection == "Introduction":
         # Header contents
         st.write('# CO2 Emission Analysis')
-        st.write('### Ai Glass Data Science Team')
-        st.image('streamlit_app/imgs/teddy.jpeg',use_column_width=True)
+        st.write('## Ai Glass Data Science Team')
+        st.write('### Meet The Team')
+        st.image('streamlit_app/imgs/teddy.jpeg',use_column_width=False, caption = 'teddy')
 
 
 
