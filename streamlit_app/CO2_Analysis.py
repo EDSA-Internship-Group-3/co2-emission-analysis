@@ -7,20 +7,16 @@ import numpy as np
 
 
 
+# App declaration
+def main():
 
-st.markdown('Main Page')
-# st.sidebar.markdown('Main Page')
-st.write('Hello world')
+    # DO NOT REMOVE the 'Recommender System' option below, however,
+    # you are welcome to add more options to enrich your app.
+    page_options = ["Introduction","Data Analysis", "Model Deployment", "Conclusion"]
 
-# st.sidebar
+    # -------------------------------------------------------------------
+    page_selection = st.sidebar.selectbox("Choose Option", page_options)
 
-'''
-Introduction of the team
-Intro problem statement
-Show objective of the project
-Data Analytics
-Referral links
-Prediction page
-Forecasting page
-Conclusion
-'''
+
+if __name__ == '__main__':
+    main()
