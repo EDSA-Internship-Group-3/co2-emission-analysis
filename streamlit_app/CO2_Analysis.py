@@ -6,8 +6,8 @@ import pandas as pd
 import numpy as np
 
 # Custom Libraries
-from data.collaborative_based import collab_model
-from recommenders.content_based import content_model
+from data.collaborative_based import xgboost_model
+#from recommenders.content_based import content_model
 
 
 
@@ -64,6 +64,7 @@ def main():
         st.write('# CO2 Emission Analysis')
         st.write('## Model Deployment')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
+
 
     
     # -------------------------------------------------------------------
