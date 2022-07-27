@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 # Custom Libraries
-from data.collaborative_based import xgboost_model
+from data.xgboost import xgboost_model
 #from recommenders.content_based import content_model
 
 
