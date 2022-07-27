@@ -5,6 +5,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+# Custom Libraries
+from data.collaborative_based import collab_model
+from recommenders.content_based import content_model
+
 
 
 # App declaration
@@ -60,7 +64,7 @@ def main():
         st.write('# CO2 Emission Analysis')
         st.write('## Model Deployment')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
-        
+
     
     # -------------------------------------------------------------------
     #        CONCLUSION PAGE

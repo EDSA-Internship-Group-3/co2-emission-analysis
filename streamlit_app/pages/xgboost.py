@@ -56,20 +56,42 @@ X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
 # -------------------------------------------------------------------
     #        Modeling
 # -------------------------------------------------------------------
+def xgboost_model():
+    # splitting data
+    x_train, x_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.15, shuffle=False, random_state=42)
 
-# splitting data
-x_train, x_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.15, shuffle=False, random_state=42)
+    #create Xgboost
+    xgb_reg = xgb.XGBRegressor(objective ='reg:squarederror', colsample_bytree = 0.6, learning_rate = 0.1, max_depth = 5, alpha = 6, n_estimators = 100, subsample = 0.7)  
 
-#create Xgboost
-xgb_reg = xgb.XGBRegressor(objective ='reg:squarederror', colsample_bytree = 0.6, learning_rate = 0.1, max_depth = 5, alpha = 6, n_estimators = 100, subsample = 0.7)  
+    # Fit the Ml model
+    # XGBoost gbtree
+    xgb_reg.fit(x_train, y_train)
 
-# Fit the Ml model
-# XGBoost gbtree
-xgb_reg.fit(x_train, y_train)
+    # evaluate xgboost model [Getting Predictions]
+    y_pred_xgb = xgb_reg.predict(x_test)
 
-# evaluate xgboost model [Getting Predictions]
-y_pred_xgb = xgb_reg.predict(x_test)
+    # ---------------------------------------------------------
+    ### Remodelling with Essential Features ###
+    # ---------------------------------------------------------
 
+    # Drop Non-Essentials
+    new_df = df.drop(['Agric_GDP', 'ei_gdp', 'pop_growth', 'pop_density', 'Deforestation', 'Population'], axis=1)
+
+    # Extracting features and label; Readying for Split 
+    X_new = new_df.drop(['CO2_emission'], axis=1)
+    y_new = new_df['CO2_emission']
+
+    # convert the scaled predictor values into a dataframe
+    X_scaled_new = pd.DataFrame(scaler.fit_transform(X_new), columns=X_new.columns)
+
+    # splitting data
+    x_train_new, x_test_new, y_train_new, y_test_new = train_test_split(X_scaled_new, y_new, test_size=0.15, shuffle=False, random_state=42)
+
+    # Create Xgboost Model
+    xgb_reg_new = xgb.XGBRegressor(objective='count:poisson', colsample_bytree=0.6, learning_rate=0.1, max_depth=3, alpha=6, n_estimators=600, subsample=0.7) #'reg:squarederror'
+
+    # Train Tree Model
+    xgb_reg_new.fit(x_train_new, y_train_new)
 
 
 
