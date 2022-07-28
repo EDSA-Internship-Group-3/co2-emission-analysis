@@ -93,6 +93,8 @@ def xgboost_model():
     # Train Tree Model
     xgb_reg_new.fit(x_train_new, y_train_new)
 
+    return 
+
 
 
 # We make use of an xgboost model trained on .
