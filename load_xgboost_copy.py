@@ -37,11 +37,18 @@ import pickle
 import warnings
 warnings.filterwarnings('ignore')
 
-# Importing data
-df = pd.read_csv("data/Our_CO2emission_Modelling_Data.csv")
 
-# Drop Unamed Column
-df = df.drop('Unnamed: 0', axis=1)
+
+# We make use of an xgboost model trained on .
+model=pickle.load(open('resources/models/220729_xgb_.pkl', 'rb'))
+
+
+# Importing data
+df = pd.read_csv("resources/datasets/Our_CO2emission_Modelling_Data.csv")
+# Drop Unamed Column & predict target
+df = df.drop(['Unnamed: 0',"CO2_emission"], axis=1)
+
+print(df.columns)
 
 # Extracting features and label; Readying for Split 
 X = df.drop(['CO2_emission'], axis=1)
@@ -93,9 +100,18 @@ def xgboost_model():
     # Train Tree Model
     xgb_reg_new.fit(x_train_new, y_train_new)
 
+    return 
 
 
-# We make use of an xgboost model trained on .
-model=pickle.load(open('data/CO2_Emission_Prediction_model', 'rb'))
+    """load model
+    select rand clumn in data
+    prepare data to predict ie.
+    drop unneeded columns
+    scaling
+
+    """
+
+
+
 
 

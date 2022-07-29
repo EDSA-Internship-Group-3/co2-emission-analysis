@@ -1,14 +1,21 @@
+import sys
+from PIL import Image
+
 # Streamlit Dependencies
 import streamlit as st
 
+
 # Data handling dependencies
-import pandas as pd
-import numpy as np
+# import pandas as pd
+# import numpy as np
 
 # Custom Libraries
-from data.xgboost import xgboost_model
+from load_xgboost import xgboost_model
 #from recommenders.content_based import content_model
 
+st.set_page_config(
+    layout='wide'
+)
 
 
 # App declaration
@@ -19,7 +26,7 @@ def main():
     page_options = ["Introduction","Data Analysis", "Model Deployment", "Conclusion"]
 
     # -------------------------------------------------------------------
-    page_selection = st.sidebar.selectbox("Choose Option", page_options)
+    page_selection = st.sidebar.radio("Page Navigation", page_options)
 
     
     # -------------------------------------------------------------------
@@ -28,15 +35,35 @@ def main():
 
     if page_selection == "Introduction":
         # Header contents
-        st.write('# CO2 Emission Analysis')
-        st.write('## Ai Glass Data Science Team')
-        st.write('### Meet The Team')
-        st.image('streamlit_app/imgs/teddy.jpeg',use_column_width=True, caption = 'Teddy')
-        st.image('streamlit_app/imgs/ahmad.jpeg',use_column_width=True, caption = 'Ahmad')
-        st.image('streamlit_app/imgs/raph.jpeg',use_column_width=True, caption = 'Raphael')
-        st.image('streamlit_app/imgs/ebere.jpeg',use_column_width=True, caption = 'Ebere')
-        st.image('streamlit_app/imgs/dare.jpeg',use_column_width=True, caption = 'Dare')
-        st.image('streamlit_app/imgs/israel.png',use_column_width=True, caption = 'Israel')
+        col1, col2 = st.columns([1,1])
+
+        with col1:
+            st.write('# CO2 Emission Analysis')
+            st.write('## Ai Glass Data Science Team')
+
+        col1, col2, col3 = st.columns([1,1,1])
+
+        st.markdown(
+            """
+            <h2 style='text-align: center;'>
+                Meet the Team
+            </h2>
+            """,
+            unsafe_allow_html=True
+        )
+
+        cols = col1, col2, col3, \
+        col5, col5, col6 = st.columns([1,1,1,1,1,1])
+
+        team_members = ["Teddy Waweru", "Ahmad","Raph",
+            "Ebere","Dare","Israel Ezema"]
+
+        for col,team_member in zip(cols, team_members):
+            with col:
+                img = Image.open(f'imgs/{team_member}.jpeg')
+                st.image(img,use_column_width=True,
+                    caption = team_member,width=1000)
+
 
         st.write('## Problem Statement')
 
@@ -64,6 +91,10 @@ def main():
         st.write('# CO2 Emission Analysis')
         st.write('## Model Deployment')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
+        if st.button('Refresh Page'):
+            xgboost_model()
+
+        xgboost_model()
 
 
     
