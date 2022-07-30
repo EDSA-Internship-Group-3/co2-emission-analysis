@@ -55,8 +55,8 @@ def main():
         cols = col1, col2, col3, \
         col5, col5, col6 = st.columns([1,1,1,1,1,1])
 
-        team_members = ["Teddy Waweru", "Ahmad","Raph",
-            "Ebere","Dare","Israel Ezema"]
+        team_members = ["Teddy Waweru", "Ahmad Barde","Raphael Mbonu",
+            "Ebere Ezeudemba","Dare Nuges","Israel Ezema"]
 
         for col,team_member in zip(cols, team_members):
             with col:
