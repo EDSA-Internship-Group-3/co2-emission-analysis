@@ -103,10 +103,10 @@ def main():
         st.write('# CO2 Emission Analysis')
         st.write('## Model Deployment')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
-        if st.button('Refresh Page'):
-            xgboost_model()
 
         xgboost_model()
+
+        st.markdown(load_markdown_file('resources/markdowns/model_deployment.md'))
 
 
     
@@ -119,6 +119,7 @@ def main():
         st.write('# CO2 Emission Analysis')
         st.write('## Conclusion')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
+        st.markdown(load_markdown_file('resources/markdowns/conclusion.md'))
     
 
 
