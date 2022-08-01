@@ -1,5 +1,6 @@
 import sys
 from PIL import Image
+from pathlib import Path
 
 # Streamlit Dependencies
 import streamlit as st
@@ -16,6 +17,10 @@ from load_xgboost import xgboost_model
 st.set_page_config(
     layout='wide'
 )
+
+def load_markdown_file(file_path):
+    with open(Path(file_path),'r',encoding='utf-8') as f:
+        return f.read()
 
 
 # App declaration
@@ -41,6 +46,7 @@ def main():
             st.write('# CO2 Emission Analysis')
             st.write('## Ai Glass Data Science Team')
 
+        
         col1, col2, col3 = st.columns([1,1,1])
 
         st.markdown(
@@ -65,9 +71,15 @@ def main():
                     caption = team_member,width=1000)
 
 
-        st.write('## Problem Statement')
+        st.write('## Introduction')
+        st.markdown(load_markdown_file('resources/markdowns/introduction.md'))
 
-        st.write('## Overview of Our Solution')
+        st.write('### Overview of Our Solution')
+        st.markdown(load_markdown_file('resources/markdowns/solution_overview.md'))
+        
+        st.write('### Problem Statement')
+        st.markdown(load_markdown_file('resources/markdowns/problem_statement.md'))
+
 
 
 
@@ -91,10 +103,10 @@ def main():
         st.write('# CO2 Emission Analysis')
         st.write('## Model Deployment')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
-        if st.button('Refresh Page'):
-            xgboost_model()
 
         xgboost_model()
+
+        st.markdown(load_markdown_file('resources/markdowns/model_deployment.md'))
 
 
     
@@ -107,6 +119,7 @@ def main():
         st.write('# CO2 Emission Analysis')
         st.write('## Conclusion')
         # st.image('resources/imgs/Image_header.png',use_column_width=True)
+        st.markdown(load_markdown_file('resources/markdowns/conclusion.md'))
     
 
 
