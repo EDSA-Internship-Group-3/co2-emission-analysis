@@ -174,8 +174,10 @@ def xgboost_model():
             step=0.05,
             )
         pred_pop_growth = st.slider('Annual Population Growth (%)',
-            min_value=df['pop_growth'].min(),
-            max_value=df['pop_growth'].max()
+            min_value=-0.5,
+            max_value=0.5,
+            value=0.0,
+            step=0.05,
             )
 
     time_factor = pred_year - last_row['Year'].values[0]
