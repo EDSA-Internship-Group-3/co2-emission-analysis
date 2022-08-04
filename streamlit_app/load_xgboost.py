@@ -66,7 +66,7 @@ def draw_pred_chart(df,row, predict_val):
             name=f"Predicted Value"
         )
     )
-    print(row['Year'].values,)
+    # print(row['Year'].values,)
     return fig
 
 @st.experimental_memo
@@ -140,9 +140,9 @@ def xgboost_model():
     with col1:
         st.markdown('### Providing future predictions')
         st.markdown('Use this section to make future predictions.')
-        pred_country = st.selectbox('Select Country:',options=df["Country"].unique())
+        pred_country = st.selectbox('Select Country:',options=df["Country"].unique(),index=list(df['Country'].unique()).index('United States'))
 
-        pred_e_type = st.selectbox('Select Energy Type:',options=E_TYPE_DICT.values())
+        pred_e_type = st.selectbox('Select Energy Type:',options=E_TYPE_DICT.values(),index=4)
 
         df = df.loc[(df['Country']==pred_country)&
         (df['e_type']==list(E_TYPE_DICT.keys())[list(E_TYPE_DICT.values()).index(pred_e_type)])]
@@ -215,7 +215,7 @@ def xgboost_model():
         st.plotly_chart(fig)
 
 
-    print(predict_val)
+    # print(predict_val)
 
 
     # ---------------------------------------------------------
