@@ -1,5 +1,6 @@
 # Script dependencies
 # Libraries for Anaysis
+import random
 import numpy as np
 import pandas as pd
 
@@ -32,7 +33,8 @@ def load_resources():
 
     # Importing data
     df = pd.read_feather("resources/datasets/220801_data.feather")
-
+    # df = pd.read_csv("resources/datasets/Our_CO2emission_Modelling_Data.csv")
+    # print(df.columns)
     return df, model,standard_scaler,E_TYPE_DICT
 
 
@@ -69,6 +71,31 @@ def draw_pred_chart(df,row, predict_val):
     # print(row['Year'].values,)
     return fig
 
+
+@st.experimental_memo
+def draw_pred_charts(df,rows, predict_vals):
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=rows['Year'],
+            y=rows['CO2_emission'],
+            name=f"CO2 Emission plot."
+        )
+    )
+    
+
+    fig.add_trace(
+        go.Scatter(
+            x=rows['Year'].values,
+            y=predict_vals,
+            name=f"Predicted Value"
+        )
+    )
+    # print(row['Year'].values,)
+    return fig
+
 @st.experimental_memo
 def predict_value(x_features):
     features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'Population', 'ei_capita', 'ei_gdp', 'pop_growth', 'pop_density', 'Manuf_GDP', 'Agric_GDP', 'Deforestation', 'emission_per_cap']]
@@ -77,6 +104,16 @@ def predict_value(x_features):
     predict_val = model.predict(scaled_features)[0]
     
     return predict_val
+
+@st.experimental_memo
+def predict_values(x_features):
+    features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'Population', 'ei_capita', 'ei_gdp', 'pop_growth', 'pop_density', 'Manuf_GDP', 'Agric_GDP', 'Deforestation', 'emission_per_cap']]
+    _, model, standard_scaler, _ = load_resources()
+    scaled_features = standard_scaler.transform(features)
+    predict_vals = model.predict(scaled_features)
+    
+    return predict_vals
+
 
 
 
@@ -88,22 +125,25 @@ def xgboost_model():
     df, model, standard_scaler, E_TYPE_DICT = load_resources()
 
 
-
-
     # We make use of an xgboost model trained on .
     st.dataframe(df.sample(n=4))
 
+    rand_country = random.choice(df['Country'].unique())
+    rand_e_type = random.choice(df['e_type'].unique())
+
     st.markdown("---")
     if st.button("Select Random data point"):
+        rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
         row = df.loc[df['CO2_emission']>1].sample(n=1)
     else:
+        rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
         row = df.loc[df['CO2_emission']>1].sample(n=1)
 
 
     actual_val = row['CO2_emission'].values[0]
 
-
     predict_val = predict_value(row)
+    predict_vals = predict_values(rows)
 
 
     
@@ -111,27 +151,32 @@ def xgboost_model():
     col1, col2 = st.columns([2,4])
     with col1:
         st.write("Predicting for the following data point:")
-        st.dataframe(row)
+        # st.dataframe(rows.loc[:1,['Country','e_type']])
 
-        st.text(f"Actual Value: \t\t{actual_val}")
-        st.text(f"Predicted Value: \t{predict_val:.2f}")
-        perc_diff = abs(predict_val - actual_val)/actual_val*100
+        pred_vals_avg = predict_vals.mean()
+        actual_vals_avg = rows['CO2_emission'].values.mean()
+        perc_diff = abs(pred_vals_avg -actual_vals_avg)/actual_vals_avg*100
+
+        st.text(f"Actual Value: \t\t{actual_vals_avg:.2f}")
+        st.text(f"Predicted Value: \t{pred_vals_avg:.2f}")
+        # perc_diff = abs(predict_val - actual_val)/actual_val*100
         st.text(f"Percentage Diff: \t{perc_diff:.1f}%")
 
 
     fig = draw_pred_chart(df, row, predict_val)
+    figs = draw_pred_charts(df, rows, predict_vals)
 
-    fig.update_layout(
+    figs.update_layout(
         title=f"""
-{row['Country'].values[0]}'s CO2 Emission plot for \
-{E_TYPE_DICT[row['e_type'].values[0]]} Energy sources.
+{rows['Country'].values[0]}'s CO2 Emission plot for \
+{E_TYPE_DICT[rows['e_type'].values[0]]} Energy sources.
         """,
         margin=dict(l=0,r=0,t=25,b=50)
     )
-    fig.update_xaxes(showgrid=False)
+    figs.update_xaxes(showgrid=False)
 
     with col2:
-        st.plotly_chart(fig)
+        st.plotly_chart(figs)
 
 
 
@@ -186,6 +231,26 @@ def xgboost_model():
     pred_e_con = last_row['e_con'].values[0]*(1 + pred_e_con)**time_factor
     pred_e_prod = last_row['e_prod'].values[0]*(1 + pred_e_prod)**time_factor
     pred_pop = last_row['Population'].values[0]*(1 + pred_pop_growth)**time_factor
+    pred_gdps = [last_row['GDP'].values[0]]
+    pred_e_cons = [last_row['e_con'].values[0]]
+    pred_e_prods = [last_row['e_prod'].values[0]]
+    pred_pops = [last_row['Population'].values[0]]
+
+    idx = 1
+    # for idx in range(1, (pred_year + 1) - last_row['Year'].values[0]):
+    while idx < pred_year - last_row['Year'].values[0]:
+        pred_gdps.append(round(pred_gdps[0]*(1 + pred_gdp)**idx,2))
+        pred_e_cons.append(round(pred_e_cons[0]*(1 + pred_e_con)**idx,2))
+        pred_e_prods.append(round(pred_e_prods[0]*(1 + pred_e_prod)**idx,2))
+        pred_pops.append(round(pred_pops[0]*(1 + pred_pop_growth)**idx,2))
+
+        idx += 1
+
+    print((pred_gdps))
+    print(len(pred_pops))
+
+
+
 
     pred_row = pd.DataFrame(
         [{  
