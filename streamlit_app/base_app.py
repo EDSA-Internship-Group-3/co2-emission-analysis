@@ -106,8 +106,6 @@ def main():
 
         xgboost_model()
 
-        st.markdown(load_markdown_file('resources/markdowns/model_deployment.md'))
-
 
     
     # -------------------------------------------------------------------

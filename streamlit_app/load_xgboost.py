@@ -1,6 +1,7 @@
 # Script dependencies
 # Libraries for Anaysis
 import random
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
@@ -20,10 +21,10 @@ import pickle
 def load_resources():
     # We make use of an StandardScaler used.
     standard_scaler = pickle.load(
-        open('resources/models/220729_standard_scaler.pkl', 'rb')
+        open('resources/models/220805_scaler.pkl', 'rb')
         )
     model = pickle.load(
-        open('resources/models/220729_transformed_xgb.pkl', 'rb')
+        open('resources/models/220805_xgb.pkl', 'rb')
         )
 
     E_TYPE_DICT = {
@@ -33,8 +34,8 @@ def load_resources():
 
     # Importing data
     df = pd.read_feather("resources/datasets/220801_data.feather")
-    # df = pd.read_csv("resources/datasets/Our_CO2emission_Modelling_Data.csv")
-    # print(df.columns)
+    df = df.loc[~(df['e_type']==5)]
+
     return df, model,standard_scaler,E_TYPE_DICT
 
 
@@ -98,7 +99,8 @@ def draw_pred_charts(df,rows, predict_vals):
 
 @st.experimental_memo
 def predict_value(x_features):
-    features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'Population', 'ei_capita', 'ei_gdp', 'pop_growth', 'pop_density', 'Manuf_GDP', 'Agric_GDP', 'Deforestation', 'emission_per_cap']]
+    features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'ei_capita', 'Manuf_GDP', 'emission_per_cap']]
+    # features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'Population', 'ei_capita', 'ei_gdp', 'pop_growth', 'pop_density', 'Manuf_GDP', 'Agric_GDP', 'Deforestation', 'emission_per_cap']]
     _, model, standard_scaler, _ = load_resources()
     scaled_features = standard_scaler.transform(features)
     predict_val = model.predict(scaled_features)[0]
@@ -107,7 +109,8 @@ def predict_value(x_features):
 
 @st.experimental_memo
 def predict_values(x_features):
-    features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'Population', 'ei_capita', 'ei_gdp', 'pop_growth', 'pop_density', 'Manuf_GDP', 'Agric_GDP', 'Deforestation', 'emission_per_cap']]
+    features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'ei_capita', 'Manuf_GDP', 'emission_per_cap']]
+    # features = x_features[['e_type', 'e_con', 'e_prod', 'GDP', 'Population', 'ei_capita', 'ei_gdp', 'pop_growth', 'pop_density', 'Manuf_GDP', 'Agric_GDP', 'Deforestation', 'emission_per_cap']]
     _, model, standard_scaler, _ = load_resources()
     scaled_features = standard_scaler.transform(features)
     predict_vals = model.predict(scaled_features)
@@ -128,21 +131,23 @@ def xgboost_model():
     # We make use of an xgboost model trained on .
     st.dataframe(df.sample(n=4))
 
+
+
     rand_country = random.choice(df['Country'].unique())
     rand_e_type = random.choice(df['e_type'].unique())
 
     st.markdown("---")
     if st.button("Select Random data point"):
         rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
-        row = df.loc[df['CO2_emission']>1].sample(n=1)
+        # row = df.loc[df['CO2_emission']>1].sample(n=1)
     else:
         rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
-        row = df.loc[df['CO2_emission']>1].sample(n=1)
+        # row = df.loc[df['CO2_emission']>1].sample(n=1)
 
 
-    actual_val = row['CO2_emission'].values[0]
+    # actual_val = row['CO2_emission'].values[0]
 
-    predict_val = predict_value(row)
+    # predict_val = predict_value(row)
     predict_vals = predict_values(rows)
 
 
@@ -163,7 +168,7 @@ def xgboost_model():
         st.text(f"Percentage Diff: \t{perc_diff:.1f}%")
 
 
-    fig = draw_pred_chart(df, row, predict_val)
+    # fig = draw_pred_chart(df, row, predict_val)
     figs = draw_pred_charts(df, rows, predict_vals)
 
     figs.update_layout(
@@ -185,10 +190,19 @@ def xgboost_model():
     with col1:
         st.markdown('### Providing future predictions')
         st.markdown('Use this section to make future predictions.')
-        pred_country = st.selectbox('Select Country:',options=df["Country"].unique(),index=list(df['Country'].unique()).index('United States'))
+        pred_country = st.selectbox('Select Country:',options=df["Country"].unique(),index=list(df['Country'].unique()).index('Norway'))
 
+    with col2:
+        st.text('')
+        st.text('')
+        st.text('')
+        st.text('')
+        st.text('')
+        st.text('')
+        st.write('.')
         pred_e_type = st.selectbox('Select Energy Type:',options=E_TYPE_DICT.values(),index=4)
 
+    with col1:
         df = df.loc[(df['Country']==pred_country)&
         (df['e_type']==list(E_TYPE_DICT.keys())[list(E_TYPE_DICT.values()).index(pred_e_type)])]
 
@@ -236,18 +250,15 @@ def xgboost_model():
     pred_e_prods = [last_row['e_prod'].values[0]]
     pred_pops = [last_row['Population'].values[0]]
 
-    idx = 1
-    # for idx in range(1, (pred_year + 1) - last_row['Year'].values[0]):
-    while idx < pred_year - last_row['Year'].values[0]:
-        pred_gdps.append(round(pred_gdps[0]*(1 + pred_gdp)**idx,2))
-        pred_e_cons.append(round(pred_e_cons[0]*(1 + pred_e_con)**idx,2))
-        pred_e_prods.append(round(pred_e_prods[0]*(1 + pred_e_prod)**idx,2))
-        pred_pops.append(round(pred_pops[0]*(1 + pred_pop_growth)**idx,2))
+    # idx = 1
+    # while idx < pred_year - last_row['Year'].values[0]:
+    #     pred_gdps.append(round(pred_gdps[0]*(1 + pred_gdp)**idx,2))
+    #     pred_e_cons.append(round(pred_e_cons[0]*(1 + pred_e_con)**idx,2))
+    #     pred_e_prods.append(round(pred_e_prods[0]*(1 + pred_e_prod)**idx,2))
+    #     pred_pops.append(round(pred_pops[0]*(1 + pred_pop_growth)**idx,2))
 
-        idx += 1
+    #     idx += 1
 
-    print((pred_gdps))
-    print(len(pred_pops))
 
 
 
@@ -276,13 +287,26 @@ def xgboost_model():
     predict_val = predict_value(pred_row)
     with col2:
         fig = draw_pred_chart(df, pred_row, predict_val)
+        fig.update_layout(
+            margin=dict(t=2,l=0,b=0)
+        )
 
         st.plotly_chart(fig)
 
+        st.info(f"""
+        Predicting {predict_val:.2f}MMTonnes produced in the year {pred_year}.
 
-    # print(predict_val)
+        This would be equivalent to ${predict_val*1000000*0.522:,.2f} worth of Carbon Credits (CCTs).
+        """)
 
 
+    print(predict_val)
+
+    def load_markdown_file(file_path):
+        with open(Path(file_path),'r',encoding='utf-8') as f:
+            return f.read()
+
+    st.markdown(load_markdown_file('resources/markdowns/model_deployment.md'))
     # ---------------------------------------------------------
     ### Remodelling with Essential Features ###
     # ---------------------------------------------------------
