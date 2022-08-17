@@ -1,0 +1,16 @@
+{
+    "version": "0.1.0",
+    "configurations": [
+        {
+            "name": "debug streamlit",
+            "type": "python",
+            "request": "launch",
+            "cwd": "streamlit_app",
+            "program": "~/dev/py_envs/ds_env/bin/streamlit",  // /home/xx/tmp/venv/bin/streamlit",
+            "args": [
+                "run",
+                "base_app.py"
+            ]
+        }
+    ]
+    }
