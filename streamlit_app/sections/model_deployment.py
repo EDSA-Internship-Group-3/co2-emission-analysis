@@ -131,39 +131,34 @@ def xgboost_model():
     # We make use of an xgboost model trained on .
     st.dataframe(df.sample(n=4))
 
-
-
-
-
-
-    avg_emission = 0
-
-    st.markdown("---")
-    if st.button("Select Random data point"):
-        while avg_emission < 0:
-            rand_country = random.choice(df['Country'].unique())
-            rand_e_type = random.choice(df['e_type'].unique())
-
-            rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
-            predict_vals = predict_values(rows)
-            avg_emission = predict_vals.mean()
-    else:
+    def rand_point():
         rand_country = random.choice(df['Country'].unique())
         rand_e_type = random.choice(df['e_type'].unique())
 
-        avg_emission = df.loc[(df['Country']==rand_country)&
-                                df['e_type']==rand_e_type,
-                                'CO2_emission'].values.mean()
         rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
         predict_vals = predict_values(rows)
         avg_emission = predict_vals.mean()
+        if avg_emission < 1:
+            predict_vals, rows = rand_point()
+
+        return predict_vals,rows
+
+
+
+
+
+
+    st.markdown("---")
+    if st.button("Select Random data point"):
+        predict_vals, rows = rand_point()
+    else:
+        predict_vals, rows = rand_point()
 
 
     # actual_val = row['CO2_emission'].values[0]
 
     # predict_val = predict_value(row)
 
-    print(f"Average Emission:{avg_emission}")
 
 
     
