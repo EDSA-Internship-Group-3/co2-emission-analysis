@@ -81,7 +81,7 @@ def draw_pred_charts(df,rows, predict_vals):
         go.Scatter(
             x=rows['Year'],
             y=rows['CO2_emission'],
-            name=f"CO2 Emission plot."
+            name=f"Recorded Carbon Emission Levels.",
         )
     )
     
@@ -90,8 +90,14 @@ def draw_pred_charts(df,rows, predict_vals):
         go.Scatter(
             x=rows['Year'].values,
             y=predict_vals,
-            name=f"Predicted Value"
+            name=f"Predicted Emission Levels",
+            line=dict(dash='dash'),
+            mode='lines'
         )
+    )
+    fig.update_layout(
+        xaxis_title="Timeseries(Year)",
+        yaxis_title="Carbon Emission(MMTonnes)"
     )
     # print(row['Year'].values,)
     return fig
@@ -149,22 +155,15 @@ def xgboost_model():
 
 
     st.markdown("---")
-    if st.button("Select Random data point"):
-        predict_vals, rows = rand_point()
-    else:
-        predict_vals, rows = rand_point()
-
-
-    # actual_val = row['CO2_emission'].values[0]
-
-    # predict_val = predict_value(row)
-
-
-
-    
 
     col1, col2 = st.columns([2,4])
     with col1:
+        st.markdown("### Random Data Selection for Prediction")
+        if st.button("Select Random data point"):
+            predict_vals, rows = rand_point()
+        else:
+            predict_vals, rows = rand_point()
+
         st.write("Predicting for the following data point:")
         # st.dataframe(rows.loc[:1,['Country','e_type']])
 
@@ -186,9 +185,18 @@ def xgboost_model():
 {rows['Country'].values[0]}'s CO2 Emission plot for \
 {E_TYPE_DICT[rows['e_type'].values[0]]} Energy sources.
         """,
-        margin=dict(l=0,r=0,t=25,b=50)
+        margin=dict(l=0,r=20,t=25,b=50)
     )
     figs.update_xaxes(showgrid=False)
+    figs.update_layout(
+        width=900, height=600,
+        legend=dict(
+            xanchor='right',
+            x=1,
+            yanchor='top',
+            y=1.1
+        )
+    )
 
     with col2:
         st.plotly_chart(figs)
