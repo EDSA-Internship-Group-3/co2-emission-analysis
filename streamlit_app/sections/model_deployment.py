@@ -1,18 +1,17 @@
-# Script dependencies
+# -------------------------------------------------------------------
+#        DEFINES THE MODEL DEPLOYMENT SECTION
+# -------------------------------------------------------------------
+
 # Libraries for Anaysis
 import random
 from pathlib import Path
-import numpy as np
 import pandas as pd
 
 import streamlit as st
 
 # Libraries for Plotting Analysis
-import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
-import time                                             # For Calulating ALgo Time Run
 
 # Libraries to Save/Restore Models
 import pickle
@@ -124,8 +123,9 @@ def predict_values(x_features):
     #        Modeling
 # -------------------------------------------------------------------
 def xgboost_model():
+    st.write('# Model Deployment')
 
-    df, model, standard_scaler, E_TYPE_DICT = load_resources()
+    df, _, _, E_TYPE_DICT = load_resources()
 
 
     # We make use of an xgboost model trained on .
@@ -133,22 +133,37 @@ def xgboost_model():
 
 
 
-    rand_country = random.choice(df['Country'].unique())
-    rand_e_type = random.choice(df['e_type'].unique())
+
+
+
+    avg_emission = 0
 
     st.markdown("---")
     if st.button("Select Random data point"):
-        rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
-        # row = df.loc[df['CO2_emission']>1].sample(n=1)
+        while avg_emission < 0:
+            rand_country = random.choice(df['Country'].unique())
+            rand_e_type = random.choice(df['e_type'].unique())
+
+            rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
+            predict_vals = predict_values(rows)
+            avg_emission = predict_vals.mean()
     else:
+        rand_country = random.choice(df['Country'].unique())
+        rand_e_type = random.choice(df['e_type'].unique())
+
+        avg_emission = df.loc[(df['Country']==rand_country)&
+                                df['e_type']==rand_e_type,
+                                'CO2_emission'].values.mean()
         rows = df.loc[(df['Country']==rand_country)&(df['e_type']==rand_e_type)]
-        # row = df.loc[df['CO2_emission']>1].sample(n=1)
+        predict_vals = predict_values(rows)
+        avg_emission = predict_vals.mean()
 
 
     # actual_val = row['CO2_emission'].values[0]
 
     # predict_val = predict_value(row)
-    predict_vals = predict_values(rows)
+
+    print(f"Average Emission:{avg_emission}")
 
 
     
