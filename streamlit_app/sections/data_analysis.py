@@ -70,7 +70,7 @@ def load_analyses():
             )
         )
 
-        st.plotly_chart(fig)
+        st.plotly_chart(fig,use_container_width=True)
 
     with col2:
         st.markdown("""
@@ -105,17 +105,17 @@ def load_analyses():
                 orientation="h"
             ),
             title={
-                "text":"Cumulative emissions for the time period",
+                # "text":"Cumulative emissions for the time period",
                 "y":0.02
                 }
         )
 
 
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
     st.write('### 2). Timeseries plot of Carbon emission and GDP')
 
-    col1, col2 = st.columns([1,1])
+    col1, col2 = st.columns([1,2])
 
     with col1:
         st.markdown(
@@ -160,22 +160,24 @@ def load_analyses():
         )
 
         fig.update_layout(
-            width=500,
+            width=800,
             margin=dict(
-                t=0
-            ),
+                t=0, r=0, l=0),
             legend=dict(
-                orientation="h"
-            )
+                orientation="h", bgcolor='rgba(0,0,0,0)',
+                yanchor='top',y=0.95,)
         )
+        fig.update_yaxes(secondary_y=True, showgrid=False, title="GDP")
+        fig.update_yaxes(secondary_y=False, title="Carbon Emissions")
+        fig.update_xaxes(title="Year")
 
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
 
     
     st.write('### 2). Greatest emitters in the dataset')
 
-    col1,col3,  col2 = st.columns([1,0.1,1])
+    col1,  col2 = st.columns([1,2])
 
     df, E_TYPE_DICT = load_resources()
 
@@ -201,8 +203,9 @@ def load_analyses():
         fig.update_layout(
             margin=dict(t=0,l=0),
         )
+        fig.update_xaxes(tickangle=45)
 
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
     with col1:
             st.markdown("""
