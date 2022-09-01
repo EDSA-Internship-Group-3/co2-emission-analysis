@@ -64,8 +64,13 @@ def load_analyses():
             e_type_scatter_charts
         )
         fig.update_layout(
-            margin=dict(t=0,l=0),
-            title="sheesh"
+            width=600, height=600,
+            margin=dict(
+                    t=0,l=0,r=10),
+            # title="sheesh",
+            legend=dict(
+                    orientation="h"
+            )
         )
 
         st.plotly_chart(fig)
