@@ -1,13 +1,11 @@
 # -------------------------------------------------------------------
 #        DEFINES THE DATA ANALYSIS SECTION
 # -------------------------------------------------------------------
-
-from email.utils import collapse_rfc2231_value
 import streamlit as st
 
 import plotly.graph_objects as go
 
-import pickle
+from plotly.subplots import make_subplots
 
 import pandas as pd
 
@@ -22,7 +20,6 @@ def load_resources():
     df = pd.read_feather("resources/datasets/220801_data.feather")
     df = df.loc[~(df['e_type']==5)]
 
-    print(df.columns)
     return df, E_TYPE_DICT
 
 
@@ -37,7 +34,7 @@ def load_analyses():
 
     st.write('### 1). Time series of carbon emissions for various energy types')
 
-    col1,col3,  col2 = st.columns([1,0.1,1])
+    col1,  col2 = st.columns([1,1])
 
     with col1:
 
@@ -64,7 +61,7 @@ def load_analyses():
             e_type_scatter_charts
         )
         fig.update_layout(
-            width=600, height=600,
+            width=400,height=400,
             margin=dict(
                     t=0,l=0,r=10),
             # title="sheesh",
@@ -78,9 +75,102 @@ def load_analyses():
     with col2:
         st.markdown("""
         We plotted the CO2 emissions categorized by their energy types.
-        The curve appears to be heavily influenced by **coal sources** of emissions. Natural gases are also causative, though the gradient is not as severe. Renewable energies & nuclear were recorded to not have any carbon emissions.
+        The curve appears to be heavily influenced by **coal sources** of emissions. Natural gases are also causative, though the gradient is not as severe. Renewable energies & nuclear were recorded to not have any carbon emissions. This is also seen in the chart below
 
         """)
+
+        fig = go.Figure(
+            data = [
+            go.Pie(
+                labels=[E_TYPE_DICT.get(i) for i in
+                        list(df.loc[~(df["Country"]=="World")]
+                            .groupby("e_type", as_index=False)
+                            .agg({"CO2_emission":"mean"})
+                            .loc[:,"e_type"].unique())],
+                values=df.loc[~(df["Country"]=="World")]
+                            .groupby("e_type", as_index=False)
+                            .agg({"CO2_emission":"mean"})
+                            .loc[:,"CO2_emission"]
+            )
+
+            ]
+        )
+
+        fig.update_layout(
+            width=600,height=300,
+            margin=dict(
+                t=0,l=0,r=2,
+            ),
+            legend=dict(
+                orientation="h"
+            ),
+            title={
+                "text":"Cumulative emissions for the time period",
+                "y":0.02
+                }
+        )
+
+
+        st.plotly_chart(fig)
+
+    st.write('### 2). Timeseries plot of Carbon emission and GDP')
+
+    col1, col2 = st.columns([1,1])
+
+    with col1:
+        st.markdown(
+        """There has been a steady constant increase in carbon emissions & GDP worldwide since the start of the century. The data shows a gradual reduction towards the end(2016), showing significant changes in human processes that cause emissions.
+        A keen note on the chart, is the bleep that occured  between 2008 - 2010, which may have been caused by economic slowdown during the global financial crisis. It is evident that the emissions lagged against the GDP data during the period.
+        """
+        )    
+    with col2:
+        
+        fig = make_subplots(specs=[[{'secondary_y':True}]])
+        #plot figure for carbon & gdp
+        print(df.columns)
+        fig.add_trace(
+            go.Scatter(
+                name="Carbon Emission",
+                x=df.loc[(df['Country']=='World')]
+                    .groupby('Year', as_index=False)
+                    .agg({'CO2_emission':'sum'})
+                    .loc[:,"Year"],
+                y=df.loc[(df['Country']=='World')]
+                    .groupby('Year', as_index=False)
+                    .agg({'CO2_emission':'sum',
+                        'GDP':'sum'})
+                    .loc[:,"CO2_emission"],
+                
+            ),secondary_y=True
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                name="GDP",
+                x=df.loc[df['Country']=='World']
+                    .groupby('Year', as_index=False)
+                    .agg({'GDP':"sum",})
+                    .loc[:,"Year"],
+                y=df.loc[df['Country']=='World']
+                    .groupby('Year', as_index=False)
+                    .agg({'GDP':"sum",})
+                    .loc[:,"GDP"],
+                mode="lines+markers"
+            )
+        )
+
+        fig.update_layout(
+            width=500,
+            margin=dict(
+                t=0
+            ),
+            legend=dict(
+                orientation="h"
+            )
+        )
+
+        st.plotly_chart(fig)
+
 
     
     st.write('### 2). Greatest emitters in the dataset')
@@ -88,7 +178,6 @@ def load_analyses():
     col1,col3,  col2 = st.columns([1,0.1,1])
 
     df, E_TYPE_DICT = load_resources()
-    print(df.columns)
 
 
     with col2:
